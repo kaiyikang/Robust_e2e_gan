@@ -1,5 +1,5 @@
 # Jointly Adversarial Enhancement Training for Robust End-to-End Speech Recognition
-testing
+
 This is an implementation of our InterSpeech2019 paper "Jointly Adversarial Enhancement Training for Robust End-to-End Speech Recognition" on Python 3, PyTorch. We propose a jointly adversarial enhancement training to boost robustness of end-to-end systems. Specifically, we use a jointly compositional scheme of mask-based enhancement network, attention-based encoder-decoder network and discriminant network during training. 
 
 # Requirements
