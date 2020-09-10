@@ -1,5 +1,6 @@
 from .base_options import BaseOptions
 
+# 该文件的目的是接收 asr_recog.py 的参数
 
 class TestOptions(BaseOptions):
     def initialize(self):

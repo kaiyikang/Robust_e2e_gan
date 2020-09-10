@@ -1,6 +1,6 @@
 # This code is ported from the following implementation written in Torch.
 # https://github.com/chainer/chainer/blob/master/examples/ptb/train_ptb_custom_loop.py
-
+# 来自 chainer 标准结构
 import argparse
 import logging
 import numpy as np

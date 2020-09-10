@@ -10,6 +10,7 @@
 # conf/queue.conf in http://kaldi-asr.org/doc/queue.html for more information,
 # or search for the string 'default_config' in utils/queue.pl or utils/slurm.pl.
 
+# run.pl 意味着程序运行在本地，--mem 设置使用多少内存, --gpu 1 开启gpu
 export train_cmd="run.pl --mem 2G"
 export cuda_cmd="run.pl --mem 2G --gpu 1"
 export decode_cmd="run.pl --mem 4G"

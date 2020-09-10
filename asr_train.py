@@ -38,11 +38,20 @@ def main():
      
     # data
     logging.info("Building dataset.")
+    
+    # 读取train data
     train_dataset = SequentialDataset(opt, os.path.join(opt.dataroot, 'train'), os.path.join(opt.dict_dir, 'train_units.txt'),) 
+    # 读取val data
     val_dataset = SequentialDataset(opt, os.path.join(opt.dataroot, 'dev'), os.path.join(opt.dict_dir, 'train_units.txt'),)    
+    
+    # train 数据采样
     train_sampler = BucketingSampler(train_dataset, batch_size=opt.batch_size) 
+    
+    # 导入 train数据, 实际就会使用这个变量作为数据, 以 train_sampler 作为依据建立batch。
     train_loader = SequentialDataLoader(train_dataset, num_workers=opt.num_workers, batch_sampler=train_sampler)
+    # 导入 val data 
     val_loader = SequentialDataLoader(val_dataset, batch_size=int(opt.batch_size/2), num_workers=opt.num_workers, shuffle=False)
+    
     opt.idim = train_dataset.get_feat_size()
     opt.odim = train_dataset.get_num_classes()
     opt.char_list = train_dataset.get_char_list()

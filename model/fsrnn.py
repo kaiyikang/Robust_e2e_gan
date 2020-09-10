@@ -55,7 +55,7 @@ class LayerNorm(nn.Module):
             y = self.gamma.view(*shape) * y + self.beta.view(*shape)
         return y        
         
-        
+# Fast-Slow Recurrent Neural Networks
 class FSRNNLM(nn.Module):
     def __init__(self, n_vocab, emb_size, fast_layers, fast_cell_size, slow_cell_size, 
                  zoneout_keep_h, zoneout_keep_c, dropout_rate=0.5, embed_vecs_init=None):

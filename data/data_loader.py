@@ -175,7 +175,7 @@ class SequentialDataset(Dataset, FbankFeatLabelParser):
         cmvn[0, :] = -mean
         cmvn[1, :] = 1 / np.sqrt(var)
         return cmvn
-                        
+    # 当使用class[index]的时候，会调用这个函数
     def __getitem__(self, index):
                            
         utt_key, utt_path = self.spe_ids[index]

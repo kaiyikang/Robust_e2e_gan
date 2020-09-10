@@ -38,7 +38,9 @@ def main():
     rs = []
     if args.non_lang_syms is not None:
         with open(args.non_lang_syms, 'r') as f:
+            # 转换成unicode格式
             nls = [unicode(x.rstrip(), 'utf_8') for x in f.readlines()]
+            # 防止x中出现re搜索符号，使用这个提前准备
             rs = [re.compile(re.escape(x)) for x in nls]
 
     if args.text:

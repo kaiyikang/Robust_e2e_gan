@@ -144,7 +144,7 @@ class RNNLM(nn.Module):
         state = {'c1': c1, 'h1': h1, 'c2': c2, 'h2': h2}
         return state, y
 
-
+# 训练lm的函数
 def train(args):
     # display torch version
     logging.info('torch version = ' + torch.__version__)
