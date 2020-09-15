@@ -8,14 +8,11 @@ Python 3.5, PyTorch 0.4.0.
 
 # Data
 ### AISHELL
-You can download [AISHELL](http://www.aishelltech.com/kysjcp) to run the code.
-You can run ```sh run.sh ``` for AISHELL, but it's recommended that you run the commands one by one.
-
 你可以下载[AISHELL](http://www.aishelltech.com/kysjcp)来运行代码。
 你可以使用命令 ```sh run.sh``` 来运行AISHELL，但还是建议你一步步的运行命令。
 
 ### Your Own Dataset
-你需要建立 train, dev and test 路径. 每一个路径上，都有 ```clean_feats.scp``` ```noisy_feats.scp``` 和 ```text``` 文件. 你可以运行 ```python3 data/prepare_feats.py data_dir feat_dir noise_repeat_num``` 区产生带有噪声的数据 ```noisy_feats.scp```.
+你需要建立 train, dev and test 路径. 每一个路径上，都有 ```clean_feats.scp``` ```noisy_feats.scp``` 和 ```text``` 文件. 你可以运行 ```python3 data/prepare_feats.py data_dir feat_dir noise_repeat_num``` 产生带有噪声的数据 ```noisy_feats.scp```.
 
 # Model 模型
 

@@ -1,0 +1,39 @@
+# /home/kang/Develop/venv/bin/python3 lm_train.py --ngpu 1 --input-unit 256 --lm-type rnnlm --unit 650 --dropout-rate 0.5 --verbose 1 --batchsize 64 --outdir checkpoints/train_rnnlm_2layer_256_650_drop0.5_bs64 --train-label checkpoints/train_rnnlm_2layer_256_650_drop0.5_bs64/local/lm_train/train.txt --valid-label checkpoints/train_rnnlm_2layer_256_650_drop0.5_bs64/local/lm_train/valid.txt --dict /home/kang/Develop/Robust_e2e_gan/k2k/data/lang_syllable/train_units.txt --embed-init-file /home/kang/Develop/Robust_e2e_gan/k2k/data/lang_syllable/sgns-wiki 
+# Started at Mon Sep 14 22:28:13 CEST 2020
+#
+2020-09-14 22:28:14,409 (lm_train:63) WARNING: CUDA_VISIBLE_DEVICES is not set.
+2020-09-14 22:28:14,585 (lm:150) INFO: torch version = 1.6.0
+2020-09-14 22:28:14,586 (lm:155) INFO: torch seed = 1
+2020-09-14 22:28:15,637 (lm:185) INFO: #vocab = 139876
+2020-09-14 22:28:15,637 (lm:186) INFO: #words in the training data = 2801933
+2020-09-14 22:28:15,638 (lm:187) INFO: #words in the validation data = 333045
+2020-09-14 22:28:15,638 (lm:188) INFO: #iterations per epoch = 1250
+2020-09-14 22:28:15,638 (lm:189) INFO: #total iterations = 31271
+2020-09-14 22:28:18,048 (lm:127) INFO: load embed_vecs_init, shape 139876 300
+RNNLM(
+  (embed): Embedding(139876, 300)
+  (d0): Dropout(p=0.5, inplace=False)
+  (l1): LSTMCell(300, 650)
+  (d1): Dropout(p=0.5, inplace=False)
+  (l2): LSTMCell(650, 650)
+  (d2): Dropout(p=0.5, inplace=False)
+  (lo): Linear(in_features=650, out_features=139876, bias=True)
+)
+Traceback (most recent call last):
+  File "lm_train.py", line 92, in <module>
+    main()
+  File "lm_train.py", line 88, in main
+    lm.train(args)
+  File "/home/kang/Develop/Robust_e2e_gan/k2k/model/lm.py", line 310, in train
+    state, loss_batch = model(state, x, t)
+  File "/home/kang/Develop/venv/lib/python3.8/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/kang/Develop/Robust_e2e_gan/k2k/model/lm.py", line 87, in forward
+    self.loss = self.lossfun(self.y, t)
+  File "/home/kang/Develop/venv/lib/python3.8/site-packages/torch/nn/functional.py", line 2422, in cross_entropy
+    return nll_loss(log_softmax(input, 1), target, weight, None, ignore_index, None, reduction)
+  File "/home/kang/Develop/venv/lib/python3.8/site-packages/torch/nn/functional.py", line 1591, in log_softmax
+    ret = input.log_softmax(dim)
+RuntimeError: CUDA out of memory. Tried to allocate 36.00 MiB (GPU 0; 1.96 GiB total capacity; 1.13 GiB already allocated; 26.00 MiB free; 1.18 GiB reserved in total by PyTorch)
+# Accounting: time=8 threads=1
+# Ended (code 1) at Mon Sep 14 22:28:21 CEST 2020, elapsed time 8 seconds

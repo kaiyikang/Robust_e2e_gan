@@ -28,7 +28,7 @@ random.seed(manualSeed)
 torch.manual_seed(manualSeed)
 torch.cuda.manual_seed(manualSeed) 
 
-
+# cmvn倒谱均值方差归一化
 def compute_cmvn_epoch(opt, train_loader, enhance_model, feat_model):
     enhance_model.eval()
     feat_model.eval() 
@@ -51,9 +51,10 @@ def compute_cmvn_epoch(opt, train_loader, enhance_model, feat_model):
     
          
 def main():    
-    opt = TrainOptions().parse()    
+    opt = TrainOptions().parse() # 参考 options 文件夹   
     device = torch.device("cuda:{}".format(opt.gpu_ids[0]) if len(opt.gpu_ids) > 0 and torch.cuda.is_available() else "cpu")
-     
+    
+    # logging
     visualizer = Visualizer(opt)  
     logging = visualizer.get_logger()
     acc_report = visualizer.add_plot_report(['train/acc', 'val/acc'], 'acc.png')
@@ -66,7 +67,7 @@ def main():
     train_sampler = BucketingSampler(train_dataset, batch_size=opt.batch_size) 
     train_loader  = MixSequentialDataLoader(train_dataset, num_workers=opt.num_workers, batch_sampler=train_sampler)
     val_loader    = MixSequentialDataLoader(val_dataset, batch_size=int(opt.batch_size/2), num_workers=opt.num_workers, shuffle=False)
-    opt.idim = train_dataset.get_feat_size()
+    opt.idim = train_dataset.get_feat_size() 
     opt.odim = train_dataset.get_num_classes()
     opt.char_list = train_dataset.get_char_list()
     opt.train_dataset_len = len(train_dataset)
@@ -75,15 +76,16 @@ def main():
     logging.info("Dataset ready!")
     
     # Setup an model
-    lr = opt.lr
-    eps = opt.eps
-    iters = opt.iters   
-    best_acc = opt.best_acc 
-    best_loss = opt.best_loss  
-    start_epoch = opt.start_epoch
+    lr = opt.lr                            # learning rate
+    eps = opt.eps                          # Epsilon constant for optimizer
+    iters = opt.iters                      # manual iters number (useful on restarts)
+    best_acc = opt.best_acc                # best_acc
+    best_loss = opt.best_loss              # best_loss
+    start_epoch = opt.start_epoch          # manual iters number (useful on restarts)
     
     enhance_model_path = None
-    if opt.enhance_resume:
+    # path to latest checkpoint (default: none)
+    if opt.enhance_resume: 
         enhance_model_path = os.path.join(opt.works_dir, opt.enhance_resume)
         if os.path.isfile(enhance_model_path):
             enhance_model = EnhanceModel.load_model(enhance_model_path, 'enhance_state_dict', opt)
@@ -91,6 +93,7 @@ def main():
             print("no checkpoint found at {}".format(enhance_model_path))     
     
     asr_model_path = None
+    # path to latest checkpoint (default: none)
     if opt.asr_resume:
         asr_model_path = os.path.join(opt.works_dir, opt.asr_resume)
         if os.path.isfile(asr_model_path):
@@ -99,6 +102,7 @@ def main():
             print("no checkpoint found at {}".format(asr_model_path))  
                                         
     joint_model_path = None
+    # path to latest checkpoint (default: none)
     if opt.joint_resume:
         joint_model_path = os.path.join(opt.works_dir, opt.joint_resume)
         if os.path.isfile(joint_model_path):
@@ -118,7 +122,8 @@ def main():
         enhance_model = EnhanceModel.load_model(joint_model_path, 'enhance_state_dict', opt)    
     if joint_model_path is not None or asr_model_path is None:  
         asr_model = ShareE2E.load_model(joint_model_path, 'asr_state_dict', opt)     
-    feat_model = FbankModel.load_model(joint_model_path, 'fbank_state_dict', opt) 
+    feat_model = FbankModel.load_model(joint_model_path, 'fbank_state_dict', opt)
+    # NOTE: isGAN has never occurced in example!!!!!!! 
     if opt.isGAN:
         gan_model = GANModel.load_model(joint_model_path, 'gan_state_dict', opt) 
     ##set_requires_grad([enhance_model], False)    
@@ -128,6 +133,7 @@ def main():
     asr_parameters = filter(lambda p: p.requires_grad, asr_model.parameters())
     if opt.isGAN:
         gan_parameters = filter(lambda p: p.requires_grad, gan_model.parameters())   
+    # Optimizer
     if opt.opt_type == 'adadelta':
         enhance_optimizer = torch.optim.Adadelta(enhance_parameters, rho=0.95, eps=eps)
         asr_optimizer = torch.optim.Adadelta(asr_parameters, rho=0.95, eps=eps)

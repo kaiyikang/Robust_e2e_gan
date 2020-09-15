@@ -1,0 +1,67 @@
+shared split sil
+shared split a4 a3 a5 a1 a2
+shared split aa
+shared split ai3 ai2 ai5 ai1 ai4
+shared split an3 an4 an5 an1 an2
+shared split ang1 ang5 ang3 ang4 ang2
+shared split ao2 ao1 ao5 ao4 ao3
+shared split b
+shared split c
+shared split ch
+shared split d
+shared split e1 e5 e2 e3 e4
+shared split ee
+shared split ei3 ei4 ei2 ei1 ei5
+shared split en4 en1 en2 en5 en3
+shared split eng5 eng1 eng4 eng3 eng2
+shared split er4 er5 er2 er3
+shared split f
+shared split g
+shared split h
+shared split i2 i4 i3 i5 i1
+shared split ia1 ia4 ia3 ia2 ia5
+shared split ian5 ian3 ian4 ian2 ian1
+shared split iang4 iang3 iang5 iang1 iang2
+shared split iao4 iao1 iao5 iao2 iao3
+shared split ie3 ie4 ie2 ie1 ie5
+shared split ii
+shared split in2 in3 in4 in5 in1
+shared split ing5 ing3 ing4 ing2 ing1
+shared split iong2 iong3 iong4 iong5 iong1
+shared split iu2 iu1 iu5 iu3 iu4
+shared split ix4 ix3 ix5 ix1 ix2
+shared split iy1 iy4 iy3 iy2 iy5
+shared split iz4
+shared split j
+shared split k
+shared split l
+shared split m
+shared split n
+shared split o2 o3 o4 o5 o1
+shared split ong3 ong5 ong2 ong1 ong4
+shared split oo
+shared split ou1 ou5 ou4 ou3 ou2
+shared split p
+shared split q
+shared split r
+shared split s
+shared split sh
+shared split t
+shared split u2 u3 u4 u1 u5
+shared split ua2 ua1 ua5 ua3 ua4
+shared split uai5 uai1 uai2 uai3 uai4
+shared split uan3 uan2 uan5 uan1 uan4
+shared split uang4 uang1 uang5 uang2 uang3
+shared split ueng5 ueng1 ueng4 ueng3
+shared split ui5 ui3 ui4 ui2 ui1
+shared split un3 un4 un1 un2 un5
+shared split uo5 uo2 uo1 uo4 uo3
+shared split uu
+shared split v4 v3 v2 v1 v5
+shared split van3 van4 van1 van2 van5
+shared split ve2 ve4 ve3 ve5 ve1
+shared split vn4 vn3 vn5 vn2 vn1
+shared split vv
+shared split x
+shared split z
+shared split zh

@@ -158,6 +158,10 @@ def train(args):
     # 0 would be fastest, but 1 seems to be reasonable
     # by considering reproducability
     # use determinisitic computation or not
+    
+    # 将这个 flag 置为True的话，每次返回的卷积算法将是确定的，即默认算法。
+    # 如果配合上设置 Torch 的随机种子为固定值的话，
+    # 应该可以保证每次运行网络的时候相同输入的输出是固定的。
     if args.debugmode < 1:
         torch.backends.cudnn.deterministic = False
         logging.info('torch cudnn deterministic is disabled')
@@ -240,6 +244,9 @@ def train(args):
     def evaluate(model, iter, bproplen=100):
         # Evaluation routine to be used for validation and test.
         # TODO(karita) use torch.no_grad here
+        # requires_grad为True时，表示需要计算Tensor的梯度。
+        # requires_grad=False可以用来冻结部分网络
+        # 只更新另一部分网络的参数。
         torch.set_grad_enabled(False)
         model.predictor.eval()
         state = None

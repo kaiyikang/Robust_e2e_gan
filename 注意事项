@@ -1,0 +1,28 @@
+在bash中，如果脚本的arg不存在，会导致脚本卡死。
+如果运行py文件，permission denided，使用chmod 755。
+
+dataroot="/home/bliu/SRC/workspace/e2e/data/clean_aishell/"
+dictroot="/home/bliu/SRC/workspace/e2e/data/lang_syllable/"
+train_set=train
+train_dev=dev
+
+
+dict=/home/bliu/SRC/workspace/e2e/data/lang_syllable/train_units.txt
+
+embed_init_file=/home/bliu/SRC/workspace/e2e/data/lang_syllable/char_embed_vec
+
+nlsyms=/home/bliu/SRC/workspace/e2e/data/lang_syllable/non_lang_syms.txt
+
+lmdatadir=checkpoints/.../local/lm_train
+
+--train-label checkpoints/.../local/lm_train/train.txt
+
+${dataroot}/train/text_syllable:
+/home/bliu/SRC/workspace/e2e/data/clean_aishell/train/text_syllable
+
+${dataroot}/${train_dev}/text_syllable:
+/home/bliu/SRC/workspace/e2e/data/clean_aishell/dev/text_syllable
+
+--valid-label ${lmdatadir}/valid.txt
+
+--dict /home/bliu/SRC/workspace/e2e/data/lang_syllable/train_units.txt

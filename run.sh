@@ -112,7 +112,7 @@ embed_init_file=${dictroot}/char_embed_vec
 
 echo "dictionary: ${dict}"
 
-nlsyms=${dictroot}/non_lang_syms.txt
+nlsyms=${dictroot}/non_lang_syms.txt # list of non-linguistic symobles, e.g., <NOISE> etc.
 
 # 创建一个checkpoint文件夹
 lmexpdir=checkpoints/train_${lmtype}_2layer_${input_unit_lm}_${hidden_unit_lm}_drop${dropout_lm}_bs${batchsize_lm}
@@ -173,10 +173,11 @@ name=aishell_${model_unit}_${etype}_e${elayers}_subsample${subsample}_${subsampl
 ##name=aishell_${etype}_e${elayers}_subsample${subsample}_unit${eunits}_proj${eprojs}_d${dlayers}_unit${dunits}_${atype}_aconvc${aconv_chans}_aconvf${aconv_filts}_mtlalpha${mtlalpha}_${opt}_bs${batchsize}_mli${maxlen_in}_mlo${maxlen_out}  --resume $resume \
 lmexpdir=checkpoints/train_fsrnnlm_2layer_256_650_drop0.5_bs64
 
-# 开始step4，训练神经网络
+
+
 if [ ${stage} -le 4 ]; then
     echo "stage 4: Network Training"
-    # 调用asr_train.py 训练神经网络
+
     python3 asr_train.py \
     --dataroot $dataroot \
     --name $name \
