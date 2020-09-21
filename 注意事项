@@ -1,6 +1,23 @@
 在bash中，如果脚本的arg不存在，会导致脚本卡死。
+
 如果运行py文件，permission denided，使用chmod 755。
 
+wav.scp 中的地址，应该是基于根目录
+
+# 安装warp-ctc
+git clone https://github.com/SeanNaren/warp-ctc.git
+cd warp-ctc
+mkdir build
+cd build
+cmake ..
+make
+cd ../pytorch_binding
+python setup.py install
+
+
+
+
+# options 配置
 dataroot="/home/bliu/SRC/workspace/e2e/data/clean_aishell/"
 dictroot="/home/bliu/SRC/workspace/e2e/data/lang_syllable/"
 train_set=train

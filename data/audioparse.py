@@ -8,7 +8,7 @@ import scipy.signal
 import librosa
 import torch
 import scipy.io as sio
-from python_speech_features import fbank, delta
+# from python_speech_features import fbank, delta
 import torchaudio
 from data import extract_fbanks_module, kaldi_io
 import decimal

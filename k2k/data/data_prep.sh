@@ -11,10 +11,11 @@
 set -e
 set -u
 set -o pipefail 
-cd `pwd`/data
+
 
 stage=0
 
+cd `pwd`/data
 
 ##################################################################
 
@@ -152,6 +153,7 @@ echo "===== Prepare Lang ====="
 if [ ${stage} -le 3 ];then
 	utils/prepare_lang.sh --position-dependent-phones false lang_syllable \
 	    "<SPOKEN_NOISE>" local/lang clean_aishell/lang || exit 1;
+
 # srcdir=$1 oov_word=$2 tmpdir=$3 dir=$4
 # <SPOKEN_NOISE>
 fi
@@ -160,7 +162,7 @@ echo "AISHELL Lang preparation succeed"
 
 echo "All done"
 
-cd `pwd`/..
+cd ..
 
 
 

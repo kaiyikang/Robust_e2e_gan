@@ -8,22 +8,22 @@ import scipy.signal
 import librosa
 import torch
 import scipy.io as sio
-from python_speech_features import fbank, delta
+#from python_speech_features import fbank, delta
 import torchaudio
 from data import extract_fbanks_module, kaldi_io
 import decimal
 
-    
+# https://pytorch.org/audio/backend.html#backend
 def load_audio(path):
     try:
         sound, _ = torchaudio.load(path)
         sound = sound.numpy()
         if len(sound.shape) > 1:
-            if sound.shape[1] == 1:
+            if sound.shape[0] == 1: # NOTE
                 sound = sound.squeeze()
             else:
                 sound = sound.mean(axis=1)  # multiple channels, average
-        sound = sound / 65536.
+        sound = sound # / 65536. NOTE 
         return sound
     except:
         print ('load_audio {} failed'.format(path))
@@ -94,13 +94,13 @@ def read_target_file(model_unit, target_path, char_list, map_oov=1):
     blank = 0       
     target_dict = {}
     space_target_dict = {}
-    char_dict = dict(zip(char_list, [x for x in range(len(char_list))]))
+    char_dict = dict(zip(char_list, [x for x in range(len(char_list))])) # 将list转换为dict
     with open(target_path, 'r', encoding='utf-8') as fid:
         for line in fid:
             split_line = line.strip().replace('\t', ' ').split(' ')
             if model_unit == 'char':
-                text = ''.join(split_line[1:])
-                token = [char_dict[x] if x in char_dict else map_oov for x in text]
+                text = ''.join(split_line[1:]) # NOTE 将第一列给剔除，很大可能是text文件
+                token = [char_dict[x] if x in char_dict else map_oov for x in text] # ‘的’ -> 2
                 space_token = [1] * len(text)
             elif model_unit == 'word':
                 token = []
@@ -113,9 +113,9 @@ def read_target_file(model_unit, target_path, char_list, map_oov=1):
                     space_token.extend(space_token_tmp)  
             if len(token) > 0:
                 for x in token:
-                    labelcount[x] += 1
+                    labelcount[x] += 1 # 统计这段话中char（单词）出现次数，存入字典中，字典包含了所有可能char。
                 transcript_num += 1
-            target_dict[split_line[0]] = token 
+            target_dict[split_line[0]] = token # uttid [2,3,21,12124,1,12] char被转换为token了。
             space_target_dict[split_line[0]] = space_token            
     labelcount[odim - 1] = transcript_num  # count <eos>
     labelcount[labelcount == 0] = 1  # flooring

@@ -51,7 +51,7 @@ python3 enhance_gan_train.py --dataroot Your data directory
 ### Joint Training
 
 你可以通过ASR损失函数来联合训练增强网络和端到端ASR网络。
-
+note： 可能出现 discriminator 的
 ```
 python3 joint_base_train.py --dataroot Your data directory
 ```

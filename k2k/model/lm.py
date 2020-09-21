@@ -172,14 +172,14 @@ def train(args):
     if not torch.cuda.is_available():
         logging.warning('cuda is not available')
 	
-    # <unk> -> <SPOKEN_NOISE>
+    # 把train里面的char，利用dict变成数字编号
     with open(args.train_label, 'rb') as f:
         train = np.array([args.char_list_dict[char]
-                          if char in args.char_list_dict else args.char_list_dict['<SPOKEN_NOISE>']
+                          if char in args.char_list_dict else args.char_list_dict['<unk>']
                           for char in f.readline().decode('utf-8').split()], dtype=np.int32)
     with open(args.valid_label, 'rb') as f:
         valid = np.array([args.char_list_dict[char]
-                          if char in args.char_list_dict else args.char_list_dict['<SPOKEN_NOISE>'] 
+                          if char in args.char_list_dict else args.char_list_dict['<unk>'] 
                           for char in f.readline().decode('utf-8').split()], dtype=np.int32)
 
     logging.info('#vocab = ' + str(args.n_vocab))
@@ -198,7 +198,7 @@ def train(args):
             for line in fid:
                 line_splits = line.strip().split()               
                 # word_dim = len(line_splits[1:])
-                word_dim = int(line_splits[1])
+                word_dim = int(line_splits[1]) # NOTE：embed_init_file 的第一行应该包含word dim的数字
                 break          
         shape = (args.n_vocab, word_dim)
         scale = 0.05
@@ -210,7 +210,8 @@ def train(args):
                     line_splits = line.strip().split()
                     char = line_splits[0]
                     if char in args.char_list_dict:
-                        vector = np.array(map(float, line_splits[1:]), dtype='float32') 
+                        vector = np.array(line_splits[1:], dtype='float32')  # NOTE：需要根据word Vector文件适配
+                        #vector = np.array(map(float, line_splits[1:]), dtype='float32') 
                         index = args.char_list_dict[char]
                         embed_vecs_init[index] = vector
             except:

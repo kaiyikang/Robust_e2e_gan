@@ -51,7 +51,8 @@ class SequentialDataset(Dataset, FbankFeatLabelParser):
         self.bins_to_samples = defaultdict(list)
         for idx, bin_id in enumerate(audio_samples_indices):
             self.bins_to_samples[bin_id].append(idx)
-            
+        
+        # 提取 feat_size
         self.delta_order         = args.delta_order
         self.left_context_width  = args.left_context_width
         self.right_context_width = args.right_context_width                        
@@ -67,9 +68,11 @@ class SequentialDataset(Dataset, FbankFeatLabelParser):
             if in_feat is not None:
                 self.feat_size = np.shape(in_feat)[1]
                 break
+
         if self.feat_size <= 0:
             raise Exception('Wrong feat_size {}'.format(self.feat_size))
                 
+        # 提取 CMVN 特征
         self.normalize_type = args.normalize_type
         self.num_utt_cmvn   = args.num_utt_cmvn       
         if self.normalize_type == 1:
@@ -77,17 +80,19 @@ class SequentialDataset(Dataset, FbankFeatLabelParser):
         else:
             self.cmvn = None  
         
+        # 获得 utt2spk
         self.utt2spk_file = os.path.join(data_dir, 'utt2spk')
         with open(self.utt2spk_file, encoding='utf-8') as f:
             utt2spk_ids = f.readlines()
         self.utt2spk_ids = {x.strip().split(' ')[0]: x.strip().split(' ')[1] for x in utt2spk_ids}
         
+        # 读取 字典 ， 获得num_classes
         self.model_unit = args.model_unit
         if self.model_unit == 'char':                 
-            self.label_file = os.path.join(data_dir, 'text_char') 
+            self.label_file = os.path.join(data_dir, 'text_char')  # NOTE 这里我是copy自text的
         elif self.model_unit == 'word':    
             self.label_file = os.path.join(data_dir, 'text_word')
-        if dict_file is not None:
+        if dict_file is not None: # NOTE 在text2token中有类似的
             with open(dict_file, 'r', encoding='utf-8') as f:
                 dictionary = f.readlines()
             char_list = [entry.split(' ')[0] for entry in dictionary]
@@ -98,6 +103,7 @@ class SequentialDataset(Dataset, FbankFeatLabelParser):
             self.char_list = None        
         self.num_classes  = len(self.char_list)        
         
+        # 获得label文件，以及dict字典，调用父级类，继续分析
         super(SequentialDataset, self).__init__(self.label_file, self.char_list)
     
     def loading_feat_len(self, feats_scp, out_scp):
@@ -285,7 +291,7 @@ class BucketingSampler(Sampler):
         ids = []
         for bin, sample_idx in self.data_source.bins_to_samples.items():
             np.random.shuffle(sample_idx)
-            ids.extend(sample_idx)
+            ids.extend(sample_idx) # 随机取 key
         self.bins = self.build_bins()
 
     def __iter__(self):

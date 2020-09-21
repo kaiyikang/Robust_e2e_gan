@@ -45,7 +45,9 @@ def main():
     parser.add_argument('--fast_layers', type=int, default=2, help='fast_layers')
     parser.add_argument('--zoneout_keep_c', type=float, default=0.5, help='zoneout_c')
     parser.add_argument('--zoneout_keep_h', type=float, default=0.9, help='zoneout_h')
-    args = parser.parse_args()
+    #args = parser.parse_args()
+    import fake_opt
+    args = fake_opt.Lm_train()
 
     # logging info
     if args.verbose > 0:
@@ -80,10 +82,9 @@ def main():
     args.n_vocab = len(char_list)
     
     import csv
-
     with open('test.csv', 'w') as f:
         for key in args.char_list_dict.keys():
-            f.write("%s,%s\n"%(key,args.char_list_dict[key]))
+            f.write("%s,%s\n"%(key,args.char_list_dict[key])) # 给每一个char唯一编号
     
     lm.train(args)
     

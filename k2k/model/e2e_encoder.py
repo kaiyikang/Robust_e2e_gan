@@ -101,15 +101,17 @@ class Encoder(torch.nn.Module):
 class BLSTMP(torch.nn.Module):
     def __init__(self, idim, elayers, cdim, hdim, subsample, subsample_type, dropout):
         super(BLSTMP, self).__init__()
+        # six.move 兼容 python2 和 3 的
         for i in six.moves.range(elayers):
             if i == 0:
-                inputdim = idim
+                inputdim = idim # 默认：输入40
             else:
                 inputdim = hdim
+            # 采用循环的方式，将名叫bilstm i 的LSTM 放入self中
             setattr(self, "bilstm%d" % i, torch.nn.LSTM(inputdim, cdim, dropout=dropout,
                                                         num_layers=1, bidirectional=True, batch_first=True))
-            # bottleneck layer to merge
-            setattr(self, "bt%d" % i, torch.nn.Linear(2 * cdim, hdim))
+            # bottleneck layer to merge 瓶颈层，这个是论文中的 linear 部分
+            setattr(self, "bt%d" % i, torch.nn.Linear(2 * cdim, hdim)) # NOTE 为什么是 2
 
         self.elayers = elayers
         self.cdim = cdim
@@ -125,7 +127,7 @@ class BLSTMP(torch.nn.Module):
         '''
         # logging.info(self.__class__.__name__ + ' input lengths: ' + str(ilens))
         for layer in six.moves.range(self.elayers):
-            xpack = pack_padded_sequence(xpad, ilens, batch_first=True)
+            xpack = pack_padded_sequence(xpad, ilens, batch_first=True) # https://www.cnblogs.com/sbj123456789/p/9834018.html
             bilstm = getattr(self, 'bilstm' + str(layer))
             ys, (hy, cy) = bilstm(xpack)
             # ys: utt list of frame x cdim x 2 (2: means bidirectional)

@@ -2,11 +2,11 @@
 
 cd `pwd`
 
-pyvenv=~/Develop/venv/bin/python3
+pyvenv=/home/kang/Develop/venv/bin/python3
 
 
 # general configuration
-stage=3        # start from 0 if you need to start from data preparation
+stage=4        # start from 0 if you need to start from data preparation
 gpu=           # 已经不再使用，请使用ngpu
 ngpu=0         # number of gpus ("0" uses cpu, otherwise use gpu)
 debugmode=1
@@ -161,8 +161,14 @@ if [ ${stage} -le 3 ]; then
     fi
 
     echo "text2token done"
-    cp data/lang_syllable/lexicon.txt data/lang_syllable/train_units.txt
-# 这里使用的是venv 中的python
+    
+    ${pyvenv} utils/build_vocab.py 'data/clean_aishell/train/text' 3 ${dict}
+
+    
+    # 这里使用的是venv 中的python
     ${cuda_cmd} ${lmexpdir}/train.log ${pyvenv} lm_train.py --ngpu 1 --input-unit ${input_unit_lm} --lm-type ${lmtype} --unit ${hidden_unit_lm} --dropout-rate ${dropout_lm} --verbose 1 --batchsize ${batchsize_lm} --outdir ${lmexpdir} --train-label ${lmdatadir}/train.txt  --valid-label ${lmdatadir}/valid.txt --dict ${dict} --embed-init-file ${dictroot}/sgns-wiki
 
 fi
+
+name=aishell_${model_unit}_${etype}_e${elayers}_subsample${subsample}_${subsample_type}_unit${eunits}_proj${eprojs}_d${dlayers}_unit${dunits}_${atype}_${aact_func}_aconvc${aconv_chans}_aconvf${aconv_filts}_lsm_type${lsm_type}_lsm_weight${lsm_weight}_mtlalpha${mtlalpha}_${opt}_bs${batchsize}_mli${maxlen_in}_mlo${maxlen_out}_dropout${dropout_rate}_fusion${fusion}
+echo $name

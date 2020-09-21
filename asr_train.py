@@ -13,8 +13,8 @@ import torch
 import torch.optim as optim
 import torch.nn.functional as F
 
-from options.train_options import TrainOptions
-from model.e2e_model import E2E
+from options.train_options import TrainOptions 
+from model.e2e_model import E2E 
 from model.feat_model import FbankModel
 from data.data_loader import SequentialDataset, SequentialDataLoader
 from data.data_sampler import BucketingSampler, DistributedBucketingSampler
@@ -25,6 +25,49 @@ manualSeed = random.randint(1, 10000)
 random.seed(manualSeed)
 torch.manual_seed(manualSeed)
 torch.cuda.manual_seed(manualSeed) 
+                            
+"""
+# general options
+--dataroot 	$dataroot =
+--name 	$name = the name of checkpoint dir
+--model-unit 	$model_unit = char
+--resume 	$resume = ${resume:=none}    # Resume the training from snapshot
+--dropout-rate ${dropout_rate} = dropout_lm = 0.5
+# encoder
+--etype 	${etype} = vggblstmp
+--elayers 	${elayers} = 8 
+--eunits 	${eunits} = 320
+--eprojs 	${eprojs} = 320
+--subsample	 ${subsample} = 1_2_2_1_1
+--subsample-type ${subsample_type} = "skip"
+--dlayers 	${dlayers} = 1
+--dunits 	${dunits} = 300
+# decoder
+--atype 	${atype} = location
+--aact-fuc 	${aact_func} = softmax
+--aconv-chans 	${aconv_chans} =  10
+--aconv-filts 	${aconv_filts} = 100
+--mtlalpha 	${mtlalpha} = 0.5 / ctc/attention
+--batch-size 	${batchsize} = 30
+--maxlen-in 	${maxlen_in} = 800
+--maxlen-out 	${maxlen_out} = 150
+--opt_type 	${opt} =  adadelta
+--verbose 	${verbose} =
+# decoding
+--lmtype 	${lmtype} = rnnlm
+--rnnlm 	${lmexpdir}/rnnlm.model.best =
+--fusion 	${fusion} = ${fusion:=none}
+--epochs 	${epochs} = 30
+
+# additional
+idim = input dim
+odim = output dim
+char_list = list of char ?
+train_dataset_len = len of dataset
+
+"""
+
+
                                                      
 def main():
     
@@ -38,24 +81,20 @@ def main():
      
     # data
     logging.info("Building dataset.")
-    
-    # 读取train data
+    # train目录 和 dict目录，作为输入
     train_dataset = SequentialDataset(opt, os.path.join(opt.dataroot, 'train'), os.path.join(opt.dict_dir, 'train_units.txt'),) 
-    # 读取val data
     val_dataset = SequentialDataset(opt, os.path.join(opt.dataroot, 'dev'), os.path.join(opt.dict_dir, 'train_units.txt'),)    
     
-    # train 数据采样
     train_sampler = BucketingSampler(train_dataset, batch_size=opt.batch_size) 
     
-    # 导入 train数据, 实际就会使用这个变量作为数据, 以 train_sampler 作为依据建立batch。
     train_loader = SequentialDataLoader(train_dataset, num_workers=opt.num_workers, batch_sampler=train_sampler)
-    # 导入 val data 
     val_loader = SequentialDataLoader(val_dataset, batch_size=int(opt.batch_size/2), num_workers=opt.num_workers, shuffle=False)
     
     opt.idim = train_dataset.get_feat_size()
     opt.odim = train_dataset.get_num_classes()
     opt.char_list = train_dataset.get_char_list()
     opt.train_dataset_len = len(train_dataset)
+    
     logging.info('#input dims : ' + str(opt.idim))
     logging.info('#output dims: ' + str(opt.odim))
     logging.info("Dataset ready!")
@@ -63,13 +102,15 @@ def main():
     # Setup a model
     asr_model = E2E(opt)
     ##fbank_model = FbankModel(opt)
-    lr = opt.lr
-    eps = opt.eps
-    iters = opt.iters
-    start_epoch = opt.start_epoch    
-    best_loss = opt.best_loss
-    best_acc = opt.best_acc
+    lr = opt.lr       # default=0.005
+    eps = opt.eps     # default=1e-8
+    iters = opt.iters # default=0
+    start_epoch = opt.start_epoch     # default=0
+    best_loss = opt.best_loss # default=float('inf')
+    best_acc = opt.best_acc # default=0
+    
     if opt.resume:
+        # 如果有中继点
         model_path = os.path.join(opt.works_dir, opt.resume)
         if os.path.isfile(model_path):
             package = torch.load(model_path, map_location=lambda storage, loc: storage)
@@ -89,14 +130,15 @@ def main():
             ##fbank_model = FbankModel.load_model(model_path, 'fbank_state_dict') 
             logging.info('Loading model {} and iters {}'.format(model_path, iters))
         else:
-            print("no checkpoint found at {}".format(model_path))                
+            print("no checkpoint found at {}".format(model_path)) 
+    # convert to cuda               
     asr_model.cuda()
     ##fbank_model.cuda()
     print(asr_model)
   
     # Setup an optimizer
     #parameters = filter(lambda p: p.requires_grad, itertools.chain(asr_model.parameters(), fbank_model.parameters()))
-    parameters = filter(lambda p: p.requires_grad, itertools.chain(asr_model.parameters()))
+    parameters = filter(lambda p: p.requires_grad, itertools.chain(asr_model.parameters())) # ?
     if opt.opt_type == 'adadelta':
         optimizer = torch.optim.Adadelta(parameters, rho=0.95, eps=eps)
     elif opt.opt_type == 'adam':
@@ -128,10 +170,13 @@ def main():
             #utt_ids, spk_ids, inputs, log_inputs, targets, input_sizes, target_sizes = data
             #fbank_features = fbank_model(inputs, fbank_cmvn)
             utt_ids, spk_ids, fbank_features, targets, input_sizes, target_sizes = data
+            
             loss_ctc, loss_att, acc, context = asr_model(fbank_features, targets, input_sizes, target_sizes, sche_samp_rate) 
             loss = opt.mtlalpha * loss_ctc + (1 - opt.mtlalpha) * loss_att
+            
             optimizer.zero_grad()  # Clear the parameter gradients
-            loss.backward()          
+            loss.backward()        # compute backwards
+                      
             # compute the gradient norm to check if it is normal or not 'fbank_state_dict': fbank_model.state_dict(), 
             grad_norm = torch.nn.utils.clip_grad_norm_(asr_model.parameters(), opt.grad_clip)
             if math.isnan(grad_norm):

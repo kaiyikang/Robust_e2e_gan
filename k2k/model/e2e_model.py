@@ -29,18 +29,20 @@ class E2E(ModelBase):
         ##self.outdir = args.outdir
         self.mtlalpha = args.mtlalpha
 
-        # below means the last number becomes eos/sos ID
+        # below means the last number becomes eos/sos ID 最后一个数字代表，也同样是eos ID
         # note that sos/eos IDs are identical
         self.sos = odim - 1
         self.eos = odim - 1
 
         # subsample info
-        # +1 means input (+1) and layers outputs (args.elayer)
-        subsample = np.ones(args.elayers + 1, dtype=np.int)
+        # +1 means input (+1) and layers outputs (args.elayer) 
+        # 初始化，默认是 8 层，意思是 ( BLSTM + Linaer ) * 8 + Input * 1
+        subsample = np.ones(args.elayers + 1, dtype=np.int) # 8 + 1 NOTE
+        # 根据etype的不同，将subsample 变量的不同，读取变化，放入subsample中。
         if args.etype == 'blstmp' or args.etype == 'cnnblstmp':
             ss = args.subsample.split("_")
-            for j in range(min(args.elayers + 1, len(ss))):
-                subsample[j] = int(ss[j])
+            for j in range(min(args.elayers + 1, len(ss))): # +1 是跳过input
+                subsample[j] = int(ss[j]) 
         else:
             logging.warning(
                 'Subsampling is not performed for vgg*. It is performed in max pooling layers at CNN.')
@@ -68,9 +70,9 @@ class E2E(ModelBase):
         elif args.atype == 'add':
             self.att = AttAdd(args.eprojs, args.dunits, args.adim)
         elif args.atype == 'location':
-            self.att = AttLoc(args.eprojs, args.dunits,
+           self.att = AttLoc(args.eprojs, args.dunits,
                               args.adim, args.aconv_chans, args.aconv_filts, 'softmax')
-        elif args.atype == 'location2d':
+        elif args.atype == 'location2d': 
             self.att = AttLoc2D(args.eprojs, args.dunits,
                                 args.adim, args.awin, args.aconv_chans, args.aconv_filts)
         elif args.atype == 'location_recurrent':
@@ -102,6 +104,7 @@ class E2E(ModelBase):
             
         # rnnlm            
         try:
+            # 决定使用什么类型的 rnnlm
             if args.fusion == 'deep_fusion' or args.fusion == 'cold_fusion':
                 if args.lmtype == 'rnnlm' and args.rnnlm:
                     rnnlm = lm.ClassifierWithState(lm.RNNLM(len(args.char_list), 300, 650))                

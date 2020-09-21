@@ -1,4 +1,6 @@
 *.wav
 *.tgz
 *.ark
-sgns-wiki
+sgns*
+*.npy
+*.pyc
