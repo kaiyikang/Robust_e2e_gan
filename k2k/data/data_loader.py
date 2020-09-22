@@ -24,9 +24,11 @@ class SequentialDataset(Dataset, FbankFeatLabelParser):
         :param data_dir : Dictionary containing the delta_order, context_width, normalize_type and max_num_utt_cmvn
         :param dict_file: Dictionary containing the sample_rate, num_channel, window_size window_shift
         """
+        # 提取参数
         self.args = args
         self.exp_path = args.exp_path
         
+        # 读取feat 和 feat的长度（如果有的话） 信息
         self.feat_type = args.feat_type
         if self.feat_type.split('_')[0] == 'kaldi':
             self.speech_scp = os.path.join(data_dir, 'feats.scp')
@@ -39,12 +41,14 @@ class SequentialDataset(Dataset, FbankFeatLabelParser):
         self.spe_ids = [x.strip().split(' ') for x in spe_ids]
         self.spe_size = len(self.spe_ids)
         
+        # 如果feat长度信息没有的话...
         if not os.path.exists(self.feat_len_scp):
             self.loading_feat_len(self.speech_scp, self.feat_len_scp)
         with open(self.feat_len_scp, encoding='utf-8') as f:
             feat_len_ids = f.readlines()
         self.feat_len_ids = {x.strip().split(' ')[0]: x.strip().split(' ')[1] for x in feat_len_ids}
         
+        # 根据长度进行归类，形如 61: [3817, 4189, 5234]
         audio_lengths = [self.load_audio_feat_len(utt_id) for utt_id in self.spe_ids]
         hist, bin_edges = np.histogram(audio_lengths, bins="auto")
         audio_samples_indices = np.digitize(audio_lengths, bins=bin_edges)
@@ -111,15 +115,18 @@ class SequentialDataset(Dataset, FbankFeatLabelParser):
         fwrite = open(out_scp, 'w')
         with open(feats_scp, 'r') as fid:
             for line in fid:
+                # 拆开 utt_id 和 path
                 line_splits = line.strip().split()
                 utt_id = line_splits[0] 
                 wav_path = line_splits[1]
+                # 读取
                 try:
+                    # 提前用kaldi生成 or 用python方法读取
                     if self.feat_type.split('_')[0] == 'kaldi':
                         in_feat = self.extract_kaldi_feat(wav_path, feat_type=self.feat_type)
                     else:
                         speech_wav = self.WaveData(wav_path)
-                        in_feat = self.extract_feat(speech_wav, feat_type=self.feat_type)                             
+                        in_feat = self.extract_feat(speech_wav, feat_type=self.feat_type)  # (?, 257) size                 
                     fwrite.write(utt_id + ' ' + str(in_feat.shape[0]) + '\n')  
                 except:
                     print(line, 'error')                               
@@ -181,9 +188,9 @@ class SequentialDataset(Dataset, FbankFeatLabelParser):
         cmvn[0, :] = -mean
         cmvn[1, :] = 1 / np.sqrt(var)
         return cmvn
-    # 当使用class[index]的时候，会调用这个函数
+    
     def __getitem__(self, index):
-                           
+        # 真正提取feature的函数
         utt_key, utt_path = self.spe_ids[index]
         if len(utt_key.split('__')) == 2:
             clean_utt_key = utt_key.split('__')[0]

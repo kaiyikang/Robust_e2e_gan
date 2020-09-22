@@ -426,7 +426,7 @@ class FbankFeatLabelParser(AudioParser):
            return None        
         
         if feat_type == 'fft':
-            utt_mat = make_fft_feat(sound)
+            utt_mat = make_fft_feat(sound) # (?, 257)
         else:
             sound = sound.astype('float32')
             if feat_type == 'fbank':

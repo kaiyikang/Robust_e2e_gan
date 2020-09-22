@@ -31,8 +31,8 @@ def main():
     opt = TrainOptions().parse()    
     device = torch.device("cuda:{}".format(opt.gpu_ids[0]) if len(opt.gpu_ids) > 0 and torch.cuda.is_available() else "cpu")
 
-    import fake_opt
-    opt = fake_opt.Asr_train()
+    #import fake_opt
+    #opt = fake_opt.Asr_train()
 
     visualizer = Visualizer(opt)  
     logging = visualizer.get_logger()
@@ -69,8 +69,8 @@ def main():
     best_loss = opt.best_loss # default=float('inf')
     best_acc = opt.best_acc # default=0
     
+    # 如果有中继点
     if opt.resume:
-        # 如果有中继点
         model_path = os.path.join(opt.works_dir, opt.resume)
         if os.path.isfile(model_path):
             package = torch.load(model_path, map_location=lambda storage, loc: storage)
@@ -95,6 +95,7 @@ def main():
     asr_model.cuda()
     fbank_model.cuda()
     print(asr_model)
+    print(fbank_model)
   
     # Setup an optimizer
     parameters = filter(lambda p: p.requires_grad, itertools.chain(asr_model.parameters(), fbank_model.parameters()))
@@ -105,11 +106,12 @@ def main():
         optimizer = torch.optim.Adam(parameters, lr=lr, betas=(opt.beta1, 0.999))                       
            
     asr_model.train()
-    fbank_model.train()    
-    sample_rampup = utils.ScheSampleRampup(opt.sche_samp_start_iter, opt.sche_samp_final_iter, opt.sche_samp_final_rate)  
+    fbank_model.train()
+    #NOTE sample_rampup = utils.ScheSampleRampup(opt.sche_samp_start_iter, opt.sche_samp_final_iter, opt.sche_samp_final_rate)  
+    sample_rampup = utils.ScheSampleRampup(opt.sche_samp_start_epoch, opt.sche_samp_final_epoch, opt.sche_samp_final_rate)  
     sche_samp_rate = sample_rampup.update(iters)
     
-    # fbank
+    # 计算fbank的cmvn输入
     fbank_cmvn_file = os.path.join(opt.exp_path, 'fbank_cmvn.npy')
     if os.path.exists(fbank_cmvn_file):
         # 如果有fbank_cmvn

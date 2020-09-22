@@ -123,7 +123,7 @@ function filter_speakers {
     fi
   done
 }
-
+echo "------------------------"
 function filter_utts {
   cat $data/utt2spk | awk '{print $1}' > $tmpdir/utts
 

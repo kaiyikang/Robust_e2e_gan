@@ -20,7 +20,8 @@ do_delta=false # 当使用CNN时，这里为true
 
 # 网络结构
 # 编码器encoder 相关的
-etype=vggblstmp     # encoder architecture type
+#etype=vggblstmp     # encoder architecture type
+etype=blstmp
 elayers=8
 eunits=320
 eprojs=320
@@ -171,4 +172,48 @@ if [ ${stage} -le 3 ]; then
 fi
 
 name=aishell_${model_unit}_${etype}_e${elayers}_subsample${subsample}_${subsample_type}_unit${eunits}_proj${eprojs}_d${dlayers}_unit${dunits}_${atype}_${aact_func}_aconvc${aconv_chans}_aconvf${aconv_filts}_lsm_type${lsm_type}_lsm_weight${lsm_weight}_mtlalpha${mtlalpha}_${opt}_bs${batchsize}_mli${maxlen_in}_mlo${maxlen_out}_dropout${dropout_rate}_fusion${fusion}
-echo $name
+##name=aishell_${etype}_e${elayers}_subsample${subsample}_unit${eunits}_proj${eprojs}_d${dlayers}_unit${dunits}_${atype}_aconvc${aconv_chans}_aconvf${aconv_filts}_mtlalpha${mtlalpha}_${opt}_bs${batchsize}_mli${maxlen_in}_mlo${maxlen_out}  --resume $resume \
+lmexpdir=checkpoints/train_fsrnnlm_2layer_256_650_drop0.5_bs64
+
+if [ ${stage} -le 4 ]; then
+    echo "stage 4: E2E Network Training"
+
+    ${pyvenv} asr_train_fbank.py \
+    --dataroot $dataroot \
+    --name $name \
+    --model-unit $model_unit \
+    --resume $resume \
+    --dropout-rate ${dropout_rate} \
+    --etype ${etype} \
+    --elayers ${elayers} \
+    --eunits ${eunits} \
+    --eprojs ${eprojs} \
+    --subsample ${subsample} \
+    --subsample-type ${subsample_type} \
+    --dlayers ${dlayers} \
+    --dunits ${dunits} \
+    --atype ${atype} \
+    --aact-fuc ${aact_func} \
+    --aconv-chans ${aconv_chans} \
+    --aconv-filts ${aconv_filts} \
+    --mtlalpha ${mtlalpha} \
+    --batch-size ${batchsize} \
+    --maxlen-in ${maxlen_in} \
+    --maxlen-out ${maxlen_out} \
+    --opt_type ${opt} \
+    --verbose ${verbose} \
+    --lmtype ${lmtype} \
+    --rnnlm ${lmexpdir}/rnnlm.model.best \
+    --fusion ${fusion} \
+    --epochs ${epochs} \
+    --feat_type 'fft' \
+    --fbank_dim 80
+fi
+
+if [ ${stage} -le 5 ]; then
+    echo "stage 5: Enhance base  Training"
+
+    ${pyvenv} enhance_base_train.py \
+    --dataroot $dataroot 
+    
+fi
